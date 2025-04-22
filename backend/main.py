@@ -19,8 +19,8 @@ app.add_middleware(
 )
 
 # Max upload limit (50 MB per request)
-MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
-MAX_IMAGE_WIDTH = 10000
+MAX_UPLOAD_SIZE = 200 * 1024 * 1024  # 200 MB
+MAX_IMAGE_WIDTH = 3500
 MAX_IMAGE_HEIGHT = 15000
 
 # Middleware to block oversized files
@@ -30,7 +30,7 @@ class LimitUploadSizeMiddleware(BaseHTTPMiddleware):
         if content_length and int(content_length) > MAX_UPLOAD_SIZE:
             return JSONResponse(
                 status_code=413,
-                content={"detail": "File too large. Max size is 50MB."}
+                content={"detail": "File too large. Max size is 200MB."}
             )
         return await call_next(request)
 
@@ -45,8 +45,7 @@ async def upload_images(files: list[UploadFile] = File(...)):
     for i, file in enumerate(files):
         if file.content_type not in ["image/jpeg", "image/png"]:
             return JSONResponse(status_code=400, content={"detail": f"Unsupported file type: {file.content_type}"})
-        if file.size and file.size > MAX_UPLOAD_SIZE:
-            return JSONResponse(status_code=413, content={"detail": f"{file.filename} is too large."})
+        
 
         path = os.path.join(folder, f"{i+1:03d}.jpg")
         with open(path, "wb") as f:
