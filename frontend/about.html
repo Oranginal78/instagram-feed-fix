@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - Oranginal Feed Resizer</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .about-container {
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 40px;
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-content {
+            line-height: 1.8;
+            font-size: 17px;
+            color: var(--text-dim);
+        }
+
+        .about-content p {
+            margin-bottom: 20px;
+        }
+
+        .about-content a {
+            color: var(--orange-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px dotted var(--orange-primary);
+            padding-bottom: 2px;
+        }
+
+        .about-content a:hover {
+            color: var(--orange-light);
+            border-bottom: 1px solid var(--orange-light);
+        }
+
+        .signature {
+            font-style: italic;
+            text-align: right;
+            color: var(--orange-light);
+            margin-top: 30px;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255, 107, 0, 0.1);
+            border-radius: 30px;
+            border: 1px solid var(--orange-primary);
+        }
+
+        .social-link:hover {
+            background: rgba(255, 107, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero-background"></div>
+
+    <header class="navbar">
+        <div class="logo">Oranginal<span>.</span></div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="ai-generator.html">AI Generator</a>
+            <a href="automation.html">Automation</a>
+            <a href="about.html" class="about-link active">About</a>
+        </nav>
+    </header>
+
+
+
+    <div class="ambient-light"></div>
+
+    <div class="about-container">
+        <h2>About the Creator</h2>
+
+        <div class="about-content">
+            <br>
+            <p>Hello, I'm Oranginal, a software engineer and creative technologist based in Paris.</p>
+
+            <p>I built this tool after Instagram's updates disrupted our connected feeds. Their new display logic?
+                Frustratingly complex.</p>
+
+            <p>This app lets you reclaim your visual storytelling - whether reassembling square posts or slicing larger
+                compositions into a cohesive grid. Check below the home page for my tested strategies!</p>
+
+            <p>Coming soon: premium features like automated posting and AI-generated seamless margins. But the core
+                tool will stay free and will fulfill its functions</p>
+
+            <p>Happy creating! Let's keep Instagram feeds visually stunning.</p>
+
+            <p class="signature">- Oranginal</p>
+
+            <p>If you want to thank me, don't hesitate to follow me on Instagram for new creative tools:</p>
+            <a href="https://www.instagram.com/oranginal_/" target="_blank" class="social-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="feather feather-instagram">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                @oranginal_
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 Oranginal Feed Resizer. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Animation for the signature
+        document.addEventListener('DOMContentLoaded', function () {
+            const signature = document.querySelector('.signature');
+            signature.style.opacity = 0;
+            setTimeout(() => {
+                signature.style.transition = 'opacity 1s ease';
+                signature.style.opacity = 1;
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

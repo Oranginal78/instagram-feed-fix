@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Generator - Oranginal Feed Resizer</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .coming-soon-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            background-color: var(--dark-bg);
+        }
+
+        .marquee-container {
+            position: absolute;
+            white-space: nowrap;
+            will-change: transform;
+            animation: marquee 20s linear infinite;
+            font-size: 120px;
+            font-weight: 800;
+            opacity: 0.1;
+            color: var(--orange-primary);
+            text-transform: uppercase;
+        }
+
+        .content-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .coming-soon {
+            font-size: 60px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--orange-primary);
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+            position: relative;
+        }
+
+        .coming-soon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--orange-primary);
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.8);
+        }
+
+        .subtext {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            margin-top: 40px;
+            display: inline-block;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100vw);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* Add some AI-specific styling */
+        .coming-soon-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 107, 0, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .ai-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--orange-primary);
+            text-shadow: 0 0 15px rgba(255, 107, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero-background"></div>
+
+    <header class="navbar">
+        <div class="logo">Oranginal<span>.</span></div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="ai-generator.html" class="active">AI Generator</a>
+            <a href="automation.html">Automation</a>
+            <a href="about.html" class="about-link">About</a>
+        </nav>
+    </header>
+
+    <div class="ambient-light"></div>
+
+    <div class="coming-soon-container">
+        <div class="marquee-container">
+            AI GENERATOR COMING SOON AI GENERATOR COMING SOON AI GENERATOR
+        </div>
+
+        <div class="content-container">
+            <div class="ai-icon">🤖</div>
+            <div class="coming-soon">AI Generator Coming Soon</div>
+            <p class="subtext">Our team is developing advanced AI tools to automatically transform and enhance your
+                Instagram feed. Stay tuned!</p>
+            <a href="index.html" class="glow-button back-btn">Back to Home</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 Oranginal Feed Resizer. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

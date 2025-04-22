@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oranginal Feed Resizer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="hero-background">
+    <!-- This is where we'll add the orange-red ambient background -->
+  </div>
+
+  <header class="navbar">
+    <div class="logo">Oranginal<span>.</span></div>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="ai-generator.html">AI Generator</a>
+      <a href="automation.html">Automation</a>
+      <a href="about.html" class="about-link">About</a>
+    </nav>
+  </header>
+
+
+  <main class="hero">
+    <div class="text">
+      <h1> A simple tool to build the perfect <span>Instagram Feed</span></h1>
+      <p>Our smart tool reformat, align, and optimize your posts to fit the modern 1080x1350 layout</p>
+      <a href="#upload-section" class="glow-button">Get Started</a>
+    </div>
+    <div class="ambient-light"></div>
+  </main>
+
+  <section id="upload-section" class="upload-section">
+    <div class="section-header">
+      <h2>Transform Your Photos</h2>
+      <p>Two simple options to enhance your Instagram content</p>
+    </div>
+
+    <div class="upload-options">
+      <div class="upload-option glass-card">
+        <h3>Option 1: Individual Photos</h3>
+        <p>For 1080×1080 square photos from old Instagram format. Upload multiple images to create a unified grid.</p>
+        <div class="input-group">
+          <label for="files" class="glow-button-alt">
+            Select Images
+            <input type="file" id="files" multiple accept="image/*" />
+          </label>
+          <div class="file-name" id="files-name">No file selected</div>
+        </div>
+        <button id="submit" class="glow-button">Transform</button>
+      </div>
+
+      <div class="upload-option glass-card">
+        <h3>Option 2: Assembled Image</h3>
+        <p>For already assembled feeds or large images. Upload a single image to be divided into Instagram-ready pieces.
+        </p>
+        <div class="input-group">
+          <label for="assembled" class="glow-button-alt">
+            Select Image
+            <input type="file" id="assembled" accept="image/*" />
+          </label>
+          <div class="file-name" id="assembled-name">No file selected</div>
+        </div>
+        <button id="submit-assembled" class="glow-button">Transform</button>
+      </div>
+    </div>
+
+    <div id="status" class="status glass-card">Ready to transform your images</div>
+
+    <div class="tips-section glass-card">
+      <h3>Tips for Better Results</h3>
+
+      <div class="tip">
+        <h4>1. Downloading Your Instagram Photos</h4>
+        <p>If your photos are still on Instagram, you can use Chrome extensions like <strong>ESUIT | Photos Downloader
+            for Instagram™</strong> to download multiple posts at once. For safety, we recommend using an alternative
+          account rather than your main account when using such extensions to avoid detection by Instagram.</p>
+      </div>
+
+      <div class="tip">
+        <h4>2. About Processed Images</h4>
+        <p>The images you receive will have blurred edges, which won't be visible on the full feed but may be noticeable
+          on individual posts. This helps counter Instagram's automatic cropping.</p>
+      </div>
+
+      <div class="tip">
+        <h4>3. Posting Strategy</h4>
+        <p>To post your grid without overwhelming your followers' feeds, post the images in order, then archive them.
+          Wait about 10 days before unarchiving them. This way, you'll avoid flooding your followers' timelines with
+          dozens of pieces from your feed.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Oranginal Feed Resizer. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Update file name display when files are selected
+    document.getElementById("files").addEventListener("change", function () {
+      const fileCount = this.files.length;
+      document.getElementById("files-name").textContent = fileCount > 0
+        ? `${fileCount} file${fileCount > 1 ? 's' : ''} selected`
+        : "No file selected";
+    });
+
+    document.getElementById("assembled").addEventListener("change", function () {
+      document.getElementById("assembled-name").textContent = this.files.length > 0
+        ? this.files[0].name
+        : "No file selected";
+    });
+
+    document.getElementById("submit").addEventListener("click", async () => {
+      const input = document.getElementById("files");
+      const files = input.files;
+      if (!files.length) return alert("Please select some images.");
+
+      const formData = new FormData();
+      Array.from(files).forEach((file) => formData.append("files", file));
+
+      const status = document.getElementById("status");
+      status.textContent = "Uploading...";
+      status.classList.add("processing");
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "instagram_feed.zip";
+          a.click();
+          status.textContent = "Download complete!";
+          status.classList.remove("processing");
+          status.classList.add("success");
+        } else {
+          status.textContent = "Error processing images.";
+          status.classList.remove("processing");
+          status.classList.add("error");
+        }
+      } catch (e) {
+        console.error(e);
+        status.textContent = "Unexpected error.";
+        status.classList.remove("processing");
+        status.classList.add("error");
+      }
+    });
+
+    document.getElementById("submit-assembled").addEventListener("click", async () => {
+      const input = document.getElementById("assembled");
+      if (!input.files.length) return alert("Please select an image.");
+
+      const formData = new FormData();
+      formData.append("file", input.files[0]);
+
+      const status = document.getElementById("status");
+      status.textContent = "Uploading...";
+      status.classList.add("processing");
+
+      try {
+        const res = await fetch("/api/upload-assembled", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "instagram_feed.zip";
+          a.click();
+          status.textContent = "Download complete!";
+          status.classList.remove("processing");
+          status.classList.add("success");
+        } else {
+          status.textContent = "Error processing image.";
+          status.classList.remove("processing");
+          status.classList.add("error");
+        }
+      } catch (e) {
+        console.error(e);
+        status.textContent = "Unexpected error.";
+        status.classList.remove("processing");
+        status.classList.add("error");
+      }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
