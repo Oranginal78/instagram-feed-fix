@@ -46,7 +46,6 @@ async def upload_images(files: list[UploadFile] = File(...)):
         if file.content_type not in ["image/jpeg", "image/png"]:
             return JSONResponse(status_code=400, content={"detail": f"Unsupported file type: {file.content_type}"})
         
-
         path = os.path.join(folder, f"{i+1:03d}.jpg")
         with open(path, "wb") as f:
             f.write(await file.read())
