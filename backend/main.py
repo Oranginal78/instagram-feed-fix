@@ -1,34 +1,16 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, UploadFile, File, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
+from PIL import Image
 import os, uuid
-from backend.image_tools import process_images, process_assembled_image
 
+from backend.image_tools import process_images, process_assembled_image
 
 app = FastAPI()
 
-from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi.responses import JSONResponse
-from fastapi import Request
-
-MAX_UPLOAD_SIZE = 200 * 1024 * 1024  # 200MB
-
-class LimitUploadSizeMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        content_length = request.headers.get("content-length")
-        if content_length and int(content_length) > MAX_UPLOAD_SIZE:
-            return JSONResponse(
-                status_code=413,
-                content={"detail": "File too large. Maximum allowed is 200MB."}
-            )
-        return await call_next(request)
-
-app.add_middleware(LimitUploadSizeMiddleware)
-
-
-
-# Configure CORS
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,48 +18,76 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define API endpoints first (before mounting static files)
+# Max upload limit (50 MB per request)
+MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
+MAX_IMAGE_WIDTH = 10000
+MAX_IMAGE_HEIGHT = 15000
+
+# Middleware to block oversized files
+class LimitUploadSizeMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > MAX_UPLOAD_SIZE:
+            return JSONResponse(
+                status_code=413,
+                content={"detail": "File too large. Max size is 50MB."}
+            )
+        return await call_next(request)
+
+app.add_middleware(LimitUploadSizeMiddleware)
+
 @app.post("/api/upload")
 async def upload_images(files: list[UploadFile] = File(...)):
-    # Create a unique session folder
     session_id = str(uuid.uuid4())
     folder = f"/tmp/{session_id}"
     os.makedirs(folder, exist_ok=True)
-    
-    # Save uploaded files
+
     for i, file in enumerate(files):
+        if file.content_type not in ["image/jpeg", "image/png"]:
+            return JSONResponse(status_code=400, content={"detail": f"Unsupported file type: {file.content_type}"})
+        if file.size and file.size > MAX_UPLOAD_SIZE:
+            return JSONResponse(status_code=413, content={"detail": f"{file.filename} is too large."})
+
         path = os.path.join(folder, f"{i+1:03d}.jpg")
         with open(path, "wb") as f:
             f.write(await file.read())
-    
-    # Process the images
+
     zip_path = process_images(folder, mode="grid")
-    
-    # Return the ZIP file
     return FileResponse(zip_path, filename="instagram_feed.zip")
+
 
 @app.post("/api/upload-assembled")
 async def upload_assembled(file: UploadFile = File(...)):
-    # Create a unique session folder
     session_id = str(uuid.uuid4())
     folder = f"/tmp/{session_id}"
     os.makedirs(folder, exist_ok=True)
-    
-    # Save the uploaded file
+
     path = os.path.join(folder, "assembled.jpg")
+    contents = await file.read()
+    
+    if len(contents) > MAX_UPLOAD_SIZE:
+        return JSONResponse(status_code=413, content={"detail": "Image too large. Max file size is 50MB."})
+
     with open(path, "wb") as f:
-        f.write(await file.read())
-    
-    # Process the assembled image
+        f.write(contents)
+
+    try:
+        with Image.open(path) as img:
+            if img.width > MAX_IMAGE_WIDTH or img.height > MAX_IMAGE_HEIGHT:
+                return JSONResponse(
+                    status_code=413,
+                    content={"detail": f"Image dimensions too large. Max allowed: {MAX_IMAGE_WIDTH} x {MAX_IMAGE_HEIGHT}px."}
+                )
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"detail": f"Invalid image: {str(e)}"})
+
     zip_path = process_assembled_image(path)
-    
-    # Return the ZIP file
     return FileResponse(zip_path, filename="instagram_feed.zip")
 
-# Define the absolute path to the frontend directory
+
+# Serve frontend
 current_dir = os.path.dirname(os.path.abspath(__file__))
 frontend_path = os.path.abspath(os.path.join(current_dir, "../frontend"))
 print(f"Serving frontend from: {frontend_path}")
 
-# Mount the static files directory AFTER defining API routes
 app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
