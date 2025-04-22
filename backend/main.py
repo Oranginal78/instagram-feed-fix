@@ -5,7 +5,28 @@ from fastapi.staticfiles import StaticFiles
 import os, uuid
 from backend.image_tools import process_images, process_assembled_image
 
+
 app = FastAPI()
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.responses import JSONResponse
+from fastapi import Request
+
+MAX_UPLOAD_SIZE = 200 * 1024 * 1024  # 200MB
+
+class LimitUploadSizeMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > MAX_UPLOAD_SIZE:
+            return JSONResponse(
+                status_code=413,
+                content={"detail": "File too large. Maximum allowed is 200MB."}
+            )
+        return await call_next(request)
+
+app.add_middleware(LimitUploadSizeMiddleware)
+
+
 
 # Configure CORS
 app.add_middleware(

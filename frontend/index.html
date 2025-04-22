@@ -119,6 +119,14 @@
       const files = input.files;
       if (!files.length) return alert("Please select some images.");
 
+      const maxSize = 200 * 1024 * 1024; // 200MB
+      for (const file of files) {
+        if (file.size > maxSize) {
+          alert(`"${file.name}" is too large. Max allowed size is 200MB.`);
+          return;
+        }
+      }
+
       const formData = new FormData();
       Array.from(files).forEach((file) => formData.append("files", file));
 
@@ -158,6 +166,11 @@
     document.getElementById("submit-assembled").addEventListener("click", async () => {
       const input = document.getElementById("assembled");
       if (!input.files.length) return alert("Please select an image.");
+      const maxSize = 200 * 1024 * 1024; // 200MB
+      if (input.files[0].size > maxSize) {
+        alert(`"${input.files[0].name}" is too large. Max allowed size is 200MB.`);
+        return;
+      }
 
       const formData = new FormData();
       formData.append("file", input.files[0]);
